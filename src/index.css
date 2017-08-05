@@ -44,27 +44,19 @@ div.container-timer {
   margin-left: 2px;
 }
 
-.main-panel {
-  margin-bottom: 40px;
+.main-panel-row-1 {
+  margin-bottom: 25px;
 }
 
-.user-type-panel {
-  margin-bottom: 50px;
+.main-panel-row-2 {
+  margin-bottom: 90px;
 }
 
-.user-type-panel label {
-  margin-right: 40px;
-}
-
-.user-type-panel label:last-child {
-  margin-right: 0px;
-}
-
-.btn {
-  padding: 10px;
+.btn, .btn-primary {
+  padding: 12px;
   border-radius: 6px;
   font-size: 100%;
-   min-width: 11em;
+   min-width: 13em;
 }
 
 .btn-primary {
@@ -96,5 +88,9 @@ div.container-timer {
 }
 
 .last-message {
+  margin-bottom: 10px;
+}
+
+.last-control-pass {
   margin-bottom: 20px;
 }

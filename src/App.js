@@ -1,10 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import * as Core from 'livesplit-core';
+import * as Constants from './Constants';
 import AutoRefreshTimer from './AutoRefreshTimer';
-
-const USERTYPE_SENDER = 'sender';
-const USERTYPE_RECEIVER = 'receiver';
 
 export default class App extends React.Component {
     static propTypes = {
@@ -28,12 +26,15 @@ export default class App extends React.Component {
             timer,
             layout,
             isConnected: false,
-            userType: USERTYPE_RECEIVER,
             lastMessage: 'None',
-            controlsVisible: false,
+            lastControlPassword: 'None',
+            isControllerMode: false,
         };
 
+        this.handleSocketMessage = this.handleSocketMessage.bind(this);
+        this.onTimerStart = this.onTimerStart.bind(this);
         this.onTimerSplit = this.onTimerSplit.bind(this);
+        this.onTimerResume = this.onTimerResume.bind(this);
         this.onTimerPause = this.onTimerPause.bind(this);
         this.onTimerReset = this.onTimerReset.bind(this);
         this.onTimerUndoSplit = this.onTimerUndoSplit.bind(this);
@@ -46,23 +47,13 @@ export default class App extends React.Component {
     componentDidMount() {
         this.webSocket = new WebSocket('wss://play.sourceruns.org:12346', 'rust-websocket');
         this.webSocket.onopen = () => {
-            this.webSocket.send('surslisten');
-            setTimeout(() => {
-                this.setState({ isConnected: true });
-            }, 500);
+            this.sendCommand('surslisten');
         };
-        this.webSocket.onmessage = (msg) => {
-            this.setState({ lastMessage: `“${msg.data}” at ${new Date().toTimeString()}` });
-            if (this.state.userType === USERTYPE_RECEIVER) {
-                this.handleSocketMessage(msg);
-            }
-        };
+        this.webSocket.onmessage = this.handleSocketMessage;
     }
 
     sendCommand(command) {
-        if (this.state.userType === USERTYPE_SENDER) {
-            this.webSocket.send(command);
-        }
+        this.webSocket.send(command);
     }
 
     componentWillUnmount() {
@@ -79,49 +70,96 @@ export default class App extends React.Component {
     }
 
     handleSocketMessage(msg) {
-        const trimmed = msg.data.trim();
-        switch (trimmed) {
-        case 'pause':
-            this.onTimerPause();
+        const tokens = msg.data.trim().split(/\s+/);
+        switch (tokens[0]) {
+        case Constants.Commands.START_TIMER:
+            this.onTimerStart(false);
+            break;
+        case Constants.Commands.PAUSE:
+            this.onTimerPause(false);
             break;
         case 'reset':
-            this.onTimerReset();
+            this.onTimerReset(false);
             break;
-        case 'split':
-            this.onTimerSplit();
+        case Constants.Commands.SPLIT:
+            this.onTimerSplit(false);
             break;
-        case 'undosplit':
-            this.onTimerUndoSplit();
+        case Constants.Commands.UNDO_SPLIT:
+            this.onTimerUndoSplit(false);
             break;
-        case 'undoallpauses':
-            this.onTimerUndoAllPauses();
+        case Constants.Commands.UNDO_ALL_PAUSES:
+            this.onTimerUndoAllPauses(false);
+            break;
+        case Constants.Commands.CONTROL_PASSWORD:
+            this.setState({ isConnected: true });
             break;
         default:
         }
+
+        const timeString = new Date().toTimeString();
+        if (tokens[0] === Constants.Commands.CONTROL_PASSWORD) {
+            this.setState({ lastControlPassword: `“${tokens[1]}” at ${timeString}` });
+        } else {
+            this.setState({ lastMessage: `“${msg.data}” at ${timeString}` });
+        }
     }
 
-    onTimerSplit() {
-        this.sendCommand('split');
+    onTimerStart(fromButton = true) {
+        if (this.state.timer.currentPhase() !== Constants.TimerPhase.NOT_RUNNING) {
+            return;
+        }
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.START_TIMER);
+        }
         this.state.timer.split();
     }
 
-    onTimerPause() {
-        this.sendCommand('pause');
+    onTimerSplit(fromButton = true) {
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.SPLIT);
+        }
+        this.state.timer.split();
+    }
+
+    onTimerResume(fromButton = true) {
+        if (this.state.timer.currentPhase() !== Constants.TimerPhase.PAUSED) {
+            return;
+        }
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.RESUME);
+        }
         this.state.timer.pause();
     }
 
-    onTimerReset() {
-        this.sendCommand('reset');
+    onTimerPause(fromButton = true) {
+        if (this.state.timer.currentPhase() === Constants.TimerPhase.PAUSED
+            || this.state.timer.currentPhase() === Constants.TimerPhase.NOT_RUNNING) {
+            return;
+        }
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.PAUSE);
+        }
+        this.state.timer.pause();
+    }
+
+    onTimerReset(fromButton = true) {
+        if (fromButton) {
+            this.sendCommand('reset');
+        }
         this.state.timer.reset();
     }
 
-    onTimerUndoSplit() {
-        this.sendCommand('undosplit');
+    onTimerUndoSplit(fromButton = true) {
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.UNDO_SPLIT);
+        }
         this.state.timer.undoSplit();
     }
 
-    onTimerUndoAllPauses() {
-        this.sendCommand('undoallpauses');
+    onTimerUndoAllPauses(fromButton = true) {
+        if (fromButton) {
+            this.sendCommand(Constants.Commands.UNDO_ALL_PAUSES);
+        }
         this.state.timer.undoAllPauses();
     }
 
@@ -130,7 +168,7 @@ export default class App extends React.Component {
     }
 
     onTimerDoubleClick() {
-        this.setState({ controlsVisible: !this.state.controlsVisible });
+        this.setState({ isControllerMode: !this.state.isControllerMode });
     }
 
     render() {
@@ -138,7 +176,7 @@ export default class App extends React.Component {
             ? 'Connected to SourceRuns'
             : 'Connecting to SourceRuns...';
         const statusColor = this.state.isConnected ? '#fff' : '#e1d666';
-        const containerBackground = this.state.controlsVisible ? '#000' : 'transparent';
+        const containerBackground = this.state.isControllerMode ? '#000' : 'transparent';
 
         return (
             <div className="main-container" style={{ background: containerBackground }}>
@@ -147,38 +185,23 @@ export default class App extends React.Component {
                     fontColor={this.props.params.fontColor}
                     onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.state.layout.stateAsJson(this.state.timer)} />
-                <div style={{ visibility: this.state.controlsVisible ? 'visible' : 'hidden' }}>
+                <div style={{ visibility: this.state.isControllerMode ? 'visible' : 'hidden' }}>
                     <div className="connection-status" style={{ color: statusColor }}>{connectionStatus}</div>
                     <div className="last-message">Last message: {this.state.lastMessage}</div>
-                    <div className="main-panel">
-                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerSplit}>SPLIT</button>
-                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerUndoSplit}>UNDO SPLIT</button>
-                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerPause}>PAUSE</button>
-                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerUndoAllPauses}>UNDO ALL PAUSES</button>
+                    <div className="last-control-pass">Last control password: {this.state.lastControlPassword}</div>
+                    <div className="main-panel-row-1">
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerStart}>START</button>
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerSplit}>SPLIT</button>
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerUndoSplit}>UNDO SPLIT</button>
                     </div>
-                    <div className="user-type-panel">
-                        <label>
-                            <input
-                                type="radio"
-                                name="userType"
-                                value={USERTYPE_SENDER}
-                                checked={this.state.userType === USERTYPE_SENDER}
-                                onChange={this.handleInput} />
-                            Controller
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="userType"
-                                value={USERTYPE_RECEIVER}
-                                checked={this.state.userType === USERTYPE_RECEIVER}
-                                onChange={this.handleInput} />
-                            Slave
-                        </label>
+                    <div className="main-panel-row-2">
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerResume}>RESUME</button>
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerPause}>PAUSE</button>
+                        <button className="btn-primary btn-main-panel" onClick={this.onTimerUndoAllPauses}>UNDO ALL PAUSES</button>
                     </div>
                     <div>
-                        <button className="btn btn-primary btn-danger-panel" onClick={this.onTimerReset}>RESET</button>
-                        <button className="btn btn-primary btn-danger-panel">OFFSET</button>
+                        <button className="btn-primary btn-danger-panel" onClick={this.onTimerReset}>RESET</button>
+                        <button className="btn-primary btn-danger-panel">OFFSET</button>
                     </div>
                 </div>
             </div>
