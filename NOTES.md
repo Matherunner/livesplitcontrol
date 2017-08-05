@@ -1,1 +1,0 @@
-Running ``yarn install`` is not enough. As ``livesplit-core`` is distributed as ES2015 files, it will not work with UglifyJS when ``yarn build``. One workaround is to run ``node ./node_modules/babel-cli/bin/babel.js --presets es2015 ./node_modules/livesplit-core/index.js > out.js`` and replace the ``index.js`` with the output ``out.js``.

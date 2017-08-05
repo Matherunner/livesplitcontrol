@@ -1,8 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import * as Core from 'livesplit-core';
 import AutoRefreshTimer from './AutoRefreshTimer';
 
+const USERTYPE_SENDER = 'sender';
+const USERTYPE_RECEIVER = 'receiver';
+
 export default class App extends React.Component {
+    static propTypes = {
+        params: PropTypes.object,
+    };
+
     constructor(props) {
         super(props);
 
@@ -20,8 +28,9 @@ export default class App extends React.Component {
             timer,
             layout,
             isConnected: false,
-            canReceiveMessage: false,
-            lastMessage: '',
+            userType: USERTYPE_RECEIVER,
+            lastMessage: 'None',
+            controlsVisible: false,
         };
 
         this.onTimerSplit = this.onTimerSplit.bind(this);
@@ -29,24 +38,29 @@ export default class App extends React.Component {
         this.onTimerReset = this.onTimerReset.bind(this);
         this.onTimerUndoSplit = this.onTimerUndoSplit.bind(this);
         this.onTimerUndoAllPauses = this.onTimerUndoAllPauses.bind(this);
+        this.onSetOffset = this.onSetOffset.bind(this);
+        this.onTimerDoubleClick = this.onTimerDoubleClick.bind(this);
         this.handleInput = this.handleInput.bind(this);
     }
 
     componentDidMount() {
-        this.webSocket = new WebSocket('ws://play.sourceruns.org:12346', 'rust-websocket');
+        this.webSocket = new WebSocket('wss://play.sourceruns.org:12346', 'rust-websocket');
         this.webSocket.onopen = () => {
-            this.setState({ isConnected: true });
+            this.webSocket.send('surslisten');
+            setTimeout(() => {
+                this.setState({ isConnected: true });
+            }, 500);
         };
         this.webSocket.onmessage = (msg) => {
-            this.setState({ lastMessage: `"${msg.data}" at ${new Date().toTimeString()}` });
-            if (this.state.canReceiveMessage) {
+            this.setState({ lastMessage: `“${msg.data}” at ${new Date().toTimeString()}` });
+            if (this.state.userType === USERTYPE_RECEIVER) {
                 this.handleSocketMessage(msg);
             }
         };
     }
 
     sendCommand(command) {
-        if (!this.state.canReceiveMessage) {
+        if (this.state.userType === USERTYPE_SENDER) {
             this.webSocket.send(command);
         }
     }
@@ -111,31 +125,62 @@ export default class App extends React.Component {
         this.state.timer.undoAllPauses();
     }
 
+    onSetOffset() {
+
+    }
+
+    onTimerDoubleClick() {
+        this.setState({ controlsVisible: !this.state.controlsVisible });
+    }
+
     render() {
         const connectionStatus = this.state.isConnected
-            ? 'Connected to sourceruns'
-            : 'Connecting to sourceruns...';
-        const statusColor = this.state.isConnected ? 'green' : '#aaaa00';
+            ? 'Connected to SourceRuns'
+            : 'Connecting to SourceRuns...';
+        const statusColor = this.state.isConnected ? '#fff' : '#e1d666';
+        const containerBackground = this.state.controlsVisible ? '#000' : 'transparent';
 
         return (
-            <div>
-                <p style={{ color: statusColor }}>{connectionStatus}</p>
-                <p>Last message: {this.state.lastMessage}</p>
+            <div className="main-container" style={{ background: containerBackground }}>
                 <AutoRefreshTimer
+                    fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
+                    fontColor={this.props.params.fontColor}
+                    onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.state.layout.stateAsJson(this.state.timer)} />
-                <button onClick={this.onTimerSplit}>Split</button>
-                <button onClick={this.onTimerPause}>Pause</button>
-                <button onClick={this.onTimerReset}>Reset</button>
-                <button onClick={this.onTimerUndoSplit}>Undo Split</button>
-                <button onClick={this.onTimerUndoAllPauses}>Undo All Pauses</button>
-                <label>
-                    <input
-                        name="canReceiveMessage"
-                        type="checkbox"
-                        value={this.state.canReceiveMessage}
-                        onChange={this.handleInput} />
-                    Is receiver
-                </label>
+                <div style={{ visibility: this.state.controlsVisible ? 'visible' : 'hidden' }}>
+                    <div className="connection-status" style={{ color: statusColor }}>{connectionStatus}</div>
+                    <div className="last-message">Last message: {this.state.lastMessage}</div>
+                    <div className="main-panel">
+                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerSplit}>SPLIT</button>
+                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerUndoSplit}>UNDO SPLIT</button>
+                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerPause}>PAUSE</button>
+                        <button className="btn btn-primary btn-main-panel" onClick={this.onTimerUndoAllPauses}>UNDO ALL PAUSES</button>
+                    </div>
+                    <div className="user-type-panel">
+                        <label>
+                            <input
+                                type="radio"
+                                name="userType"
+                                value={USERTYPE_SENDER}
+                                checked={this.state.userType === USERTYPE_SENDER}
+                                onChange={this.handleInput} />
+                            Controller
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="userType"
+                                value={USERTYPE_RECEIVER}
+                                checked={this.state.userType === USERTYPE_RECEIVER}
+                                onChange={this.handleInput} />
+                            Slave
+                        </label>
+                    </div>
+                    <div>
+                        <button className="btn btn-primary btn-danger-panel" onClick={this.onTimerReset}>RESET</button>
+                        <button className="btn btn-primary btn-danger-panel">OFFSET</button>
+                    </div>
+                </div>
             </div>
         );
     }

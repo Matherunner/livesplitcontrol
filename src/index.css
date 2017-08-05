@@ -1,5 +1,100 @@
+html {
+  background: transparent;
+}
+
+html, body, div#root {
+  height: 100%;
+  width: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  color: #fff;
+  font-family: 'PT Sans', sans-serif;
+}
+
+div.main-container {
+  height: 100%;
+  width: 100%;
+  text-align: center;
+}
+
+div.container-timer {
+  padding-top: 100px;
+  margin: 0px auto 100px auto;
+  text-align: center;
+  color: #ea7500;
+  cursor: pointer;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.timer-time {
+  font-size: 64pt;
+  font-weight: normal;
+}
+
+.timer-fraction {
+  font-size: 32pt;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.main-panel {
+  margin-bottom: 40px;
+}
+
+.user-type-panel {
+  margin-bottom: 50px;
+}
+
+.user-type-panel label {
+  margin-right: 40px;
+}
+
+.user-type-panel label:last-child {
+  margin-right: 0px;
+}
+
+.btn {
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 100%;
+   min-width: 11em;
+}
+
+.btn-primary {
+  border: 1px solid #fff;
+  background-color: inherit;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #fff;
+  color: #000;
+}
+
+.btn-primary:active {
+  background-color: #bbb;
+  box-shadow: inset 1px 1px 4px black;
+}
+
+.btn-main-panel {
+  margin: 0px 5px 0px 5px;
+}
+
+.btn-danger-panel {
+  margin: 0px 50px 0px 50px;
+}
+
+.connection-status {
+  margin-bottom: 10px;
+}
+
+.last-message {
+  margin-bottom: 20px;
 }

@@ -5,6 +5,7 @@
   "homepage": "https://www.jwchong.com/marathon",
   "dependencies": {
     "livesplit-core": "^0.6.4",
+    "query-string": "^5.0.0",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
   },
