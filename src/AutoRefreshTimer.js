@@ -51,8 +51,10 @@ export default class AutoRefreshTimer extends React.Component {
 
         return (
             <div className="container-timer" onDoubleClick={this.props.onDoubleClick}>
-                <span className="timer-time" style={timeStyle}>{this.state.timerTime}</span>
-                <span className="timer-fraction" style={fractionStyle}>{this.state.timerFraction}</span>
+                <div>
+                    <span className="timer-time" style={timeStyle}>{this.state.timerTime}</span>
+                    <span className="timer-fraction" style={fractionStyle}>{this.state.timerFraction}</span>
+                </div>
             </div>
         );
     }

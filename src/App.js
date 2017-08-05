@@ -176,16 +176,22 @@ export default class App extends React.Component {
             ? 'Connected to SourceRuns'
             : 'Connecting to SourceRuns...';
         const statusColor = this.state.isConnected ? '#fff' : '#e1d666';
-        const containerBackground = this.state.isControllerMode ? '#000' : 'transparent';
+        const controlsStyle = {
+            display: this.state.isControllerMode ? 'block' : 'none',
+        };
+        const mainContainerStyle = {
+            background: this.state.isControllerMode ? '#000' : 'transparent',
+            display: this.state.isControllerMode ? 'block' : 'flex',
+        };
 
         return (
-            <div className="main-container" style={{ background: containerBackground }}>
+            <div className="main-container" style={mainContainerStyle}>
                 <AutoRefreshTimer
                     fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
                     fontColor={this.props.params.fontColor}
                     onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.state.layout.stateAsJson(this.state.timer)} />
-                <div style={{ visibility: this.state.isControllerMode ? 'visible' : 'hidden' }}>
+                <div style={controlsStyle}>
                     <div className="connection-status" style={{ color: statusColor }}>{connectionStatus}</div>
                     <div className="last-message">Last message: {this.state.lastMessage}</div>
                     <div className="last-control-pass">Last control password: {this.state.lastControlPassword}</div>
@@ -201,7 +207,7 @@ export default class App extends React.Component {
                     </div>
                     <div>
                         <button className="btn-primary btn-danger-panel" onClick={this.onTimerReset}>RESET</button>
-                        <button className="btn-primary btn-danger-panel">OFFSET</button>
+                        <button className="btn-primary btn-danger-panel" onClick={this.onSetOffset}>OFFSET</button>
                     </div>
                 </div>
             </div>

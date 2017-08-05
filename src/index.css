@@ -18,6 +18,9 @@ div.main-container {
   height: 100%;
   width: 100%;
   text-align: center;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 div.container-timer {
@@ -26,6 +29,10 @@ div.container-timer {
   text-align: center;
   color: #ea7500;
   cursor: pointer;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   -webkit-user-select: none;
   -moz-user-select: none;
