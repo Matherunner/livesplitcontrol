@@ -30,7 +30,7 @@ Decide on the server URL you want to deploy this app on. Then edit the ``homepag
 
     $ yarn build
 
-The general files will be in ``build``. Simply copy the files to the server and you're done.
+The generated files will be in ``build``. Simply copy the files to the server and you're done.
 
 For development, it may be more convenient to run
 
