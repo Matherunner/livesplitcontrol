@@ -206,7 +206,7 @@ export default class App extends React.Component {
                     getState={() => this.state.layout.stateAsJson(this.state.timer)} />
                 <div style={controlsStyle}>
                     <div className="connection-status" style={{ color: statusColor }}>{connectionStatus}</div>
-                    <div className="last-message">Last message: {this.state.lastMessage}</div>
+                    <div className="last-message">Last message received: {this.state.lastMessage}</div>
                     <div className="last-control-pass">Last control password: {this.state.lastControlPassword}</div>
                     <div className="main-panel-row-1">
                         <button className="btn-primary btn-main-panel" onClick={this.onTimerStart}>START</button>
