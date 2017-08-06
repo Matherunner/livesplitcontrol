@@ -4,6 +4,7 @@ import * as Core from 'livesplit-core';
 import * as Constants from './Constants';
 import TimerWrapper from './TimerWrapper';
 import AutoRefreshTimer from './AutoRefreshTimer';
+import AutoIntervalUpdate from './AutoIntervalUpdate';
 
 export default class App extends React.Component {
     static propTypes = {
@@ -69,7 +70,10 @@ export default class App extends React.Component {
             // Delay all timer functions.
             if (offset > 0) {
                 const commandQueue = [...this.state.commandQueue];
-                commandQueue.push(tokens[0]);
+                commandQueue.push({
+                    command: tokens[0],
+                    time: (new Date()).getTime() + offset,
+                });
                 this.setState({ commandQueue });
 
                 setTimeout(() => {
@@ -128,7 +132,12 @@ export default class App extends React.Component {
         if (this.state.commandQueue.length === 0) {
             return 'NIL';
         }
-        return this.state.commandQueue.join(', ');
+
+        const currentTime = (new Date()).getTime();
+        return this.state.commandQueue.map((cmd) => {
+            const timeDiff = Math.floor((cmd.time - currentTime) / 1000);
+            return `${cmd.command} (${timeDiff})`;
+        }).join(', ');
     }
 
     render() {
@@ -164,7 +173,12 @@ export default class App extends React.Component {
                             </tr>
                             <tr>
                                 <th>COMMAND QUEUE</th>
-                                <td>{this.commandQueueString}</td>
+                                <td>
+                                    <AutoIntervalUpdate
+                                        interval={500}
+                                        enabled={this.state.commandQueue.length !== 0}
+                                        render={() => <span>{this.commandQueueString}</span>} />
+                                </td>
                             </tr>
                             <tr>
                                 <th>LAST DOWNLINK COMMAND</th>
