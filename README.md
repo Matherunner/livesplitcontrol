@@ -1,4 +1,4 @@
-# SourceRuns Official Timekeeper
+# SourceRuns Marathon Official Timekeeper
 
 Contact the relevant people at SourceRuns to understand the purpose of this project.
 
@@ -9,7 +9,7 @@ To be used in conjunction with [LiveSplit.NetControlClient](https://github.com/Y
 Certain aspects of the timer can be customised/modified from their defaults via URL query parameters. Remember to **percent encode** the input values, especially for ``wsUrl``.
 
 | Query Parameter   | Input                        |  Description                              |
-| ----------------- |:----------------------------:| -----------------------------------------:|
+|:----------------- |:---------------------------- |:----------------------------------------- |
 | fontSizeScale     | Positive number              | Scale the timer font size by input        |
 | fontColor         | RGB in hex (e.g. acff83)     | Set the timer font colour                 |
 | offset            | Positive integer in ms       | Set the command time offset               |
