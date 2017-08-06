@@ -115,6 +115,9 @@ export default class App extends React.Component {
     }
 
     onTimerSplit(fromButton = true) {
+        if (this.state.timer.currentPhase() === Constants.TimerPhase.NOT_RUNNING) {
+            return;
+        }
         if (fromButton) {
             this.sendCommand(Constants.Commands.SPLIT);
         }
