@@ -11,7 +11,7 @@ body {
   margin: 0;
   padding: 0;
   color: #fff;
-  font-family: 'PT Sans', sans-serif;
+  font-family: 'Roboto', sans-serif;
 }
 
 div.main-container {
@@ -42,12 +42,12 @@ div.container-timer {
 
 .timer-time {
   font-size: 64pt;
-  font-weight: normal;
+  font-weight: 700;
 }
 
 .timer-fraction {
-  font-size: 32pt;
-  font-weight: 700;
+  font-size: 36pt;
+  font-weight: 900;
   margin-left: 2px;
 }
 

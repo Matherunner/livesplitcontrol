@@ -40,7 +40,7 @@ export default class AutoRefreshTimer extends React.Component {
 
     render() {
         let timeFontSize = 64;
-        let fractionFontSize = 32;
+        let fractionFontSize = 36;
         if (this.props.fontSizeScale && !this.props.fontSizeScale.isNaN) {
             timeFontSize *= this.props.fontSizeScale;
             fractionFontSize *= this.props.fontSizeScale;
