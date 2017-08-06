@@ -29,6 +29,7 @@ export default class App extends React.Component {
             lastMessage: 'None',
             lastControlPassword: 'None',
             isControllerMode: false,
+            eventOffset: 0,
         };
 
         this.handleSocketMessage = this.handleSocketMessage.bind(this);
@@ -185,8 +186,7 @@ export default class App extends React.Component {
 
     render() {
         const connectionStatus = this.state.isConnected
-            ? 'Connected to SourceRuns'
-            : 'Connecting to SourceRuns...';
+            ? 'Connected' : 'Connecting...';
         const statusColor = this.state.isConnected ? '#fff' : '#e1d666';
         const controlsStyle = {
             display: this.state.isControllerMode ? 'block' : 'none',
@@ -205,9 +205,26 @@ export default class App extends React.Component {
                     onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.state.layout.stateAsJson(this.state.timer)} />
                 <div style={controlsStyle}>
-                    <div className="connection-status" style={{ color: statusColor }}>{connectionStatus}</div>
-                    <div className="last-message">Last message received: {this.state.lastMessage}</div>
-                    <div className="last-control-pass">Last control password: {this.state.lastControlPassword}</div>
+                    <table className="table-status">
+                        <tbody>
+                            <tr>
+                                <th>CONNECTION STATUS</th>
+                                <td style={{ color: statusColor }}>{connectionStatus}</td>
+                            </tr>
+                            <tr>
+                                <th>COMMAND TIME OFFSET</th>
+                                <td>{this.state.eventOffset}</td>
+                            </tr>
+                            <tr>
+                                <th>LAST DOWNLINK COMMAND</th>
+                                <td>{this.state.lastMessage}</td>
+                            </tr>
+                            <tr>
+                                <th>LAST CONTROL PASSWORD</th>
+                                <td>{this.state.lastControlPassword}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <div className="main-panel-row-1">
                         <button className="btn-primary btn-main-panel" onClick={this.onTimerStart}>START</button>
                         <button className="btn-primary btn-main-panel" onClick={this.onTimerSplit}>SPLIT</button>

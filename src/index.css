@@ -25,8 +25,8 @@ div.main-container {
 }
 
 div.container-timer {
-  padding-top: 100px;
-  margin: 0px auto 100px auto;
+  padding-top: 70px;
+  margin: 0px auto 70px auto;
   text-align: center;
   color: #ea7500;
   cursor: pointer;
@@ -91,14 +91,22 @@ div.container-timer {
   margin: 0px 50px 0px 50px;
 }
 
-.connection-status {
-  margin-bottom: 10px;
+table.table-status {
+  border-top: 1px solid #fff;
+  border-bottom: 1px solid #fff;
+  margin: 0px auto 40px auto;
+  text-align: left;
+  border-collapse: separate;
+  border-spacing: 14px 8px;
 }
 
-.last-message {
-  margin-bottom: 10px;
+table.table-status td {
+  width: 30em;
+  vertical-align: text-top;
 }
 
-.last-control-pass {
-  margin-bottom: 20px;
+table.table-status th {
+  padding-right: 8px;
+  font-weight: 400;
+  vertical-align: text-top;
 }
