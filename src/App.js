@@ -19,15 +19,16 @@ export default class App extends React.Component {
         run.setCategoryName('Main Category');
         run.pushSegment(Core.Segment.new('Time'));
 
-        const timer = new TimerWrapper(run);
+        let eventOffset = parseInt(this.props.params.offset, 10);
+        eventOffset = isNaN(eventOffset) ? 0 : eventOffset;
 
         this.state = {
-            timer,
+            timer: new TimerWrapper(run),
             isConnected: false,
             lastMessage: 'NIL',
             lastControlPassword: 'NIL',
             isControllerMode: false,
-            eventOffset: 0,
+            eventOffset,
             commandQueue: [],
         };
 
