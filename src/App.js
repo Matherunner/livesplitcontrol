@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import * as Core from 'livesplit-core';
 import * as Constants from './Constants';
+import TimerWrapper from './TimerWrapper';
 import AutoRefreshTimer from './AutoRefreshTimer';
 
 export default class App extends React.Component {
@@ -13,36 +14,25 @@ export default class App extends React.Component {
         super(props);
 
         const run = Core.Run.new();
-        run.setGameName('Test Game');
+        run.setGameName('Game');
         run.setCategoryName('Main Category');
         run.pushSegment(Core.Segment.new('Time'));
 
-        const timer = Core.Timer.new(run);
-
-        const layout = Core.Layout.new();
-        layout.push(Core.TimerComponent.new().intoGeneric());
+        const timer = new TimerWrapper(run);
 
         this.state = {
             timer,
-            layout,
             isConnected: false,
-            lastMessage: 'None',
-            lastControlPassword: 'None',
+            lastMessage: 'NIL',
+            lastControlPassword: 'NIL',
             isControllerMode: false,
             eventOffset: 0,
+            commandQueue: [],
         };
 
         this.handleSocketMessage = this.handleSocketMessage.bind(this);
-        this.onTimerStart = this.onTimerStart.bind(this);
-        this.onTimerSplit = this.onTimerSplit.bind(this);
-        this.onTimerResume = this.onTimerResume.bind(this);
-        this.onTimerPause = this.onTimerPause.bind(this);
-        this.onTimerReset = this.onTimerReset.bind(this);
-        this.onTimerUndoSplit = this.onTimerUndoSplit.bind(this);
-        this.onTimerUndoAllPauses = this.onTimerUndoAllPauses.bind(this);
-        this.onSetOffset = this.onSetOffset.bind(this);
+        this.handleLocalMessage = this.handleLocalMessage.bind(this);
         this.onTimerDoubleClick = this.onTimerDoubleClick.bind(this);
-        this.handleInput = this.handleInput.bind(this);
     }
 
     componentDidMount() {
@@ -53,7 +43,7 @@ export default class App extends React.Component {
         const url = this.props.params.wsUrl || 'wss://play.sourceruns.org:12346';
         this.webSocket = new WebSocket(url, 'rust-websocket');
         this.webSocket.onopen = () => {
-            this.sendCommand('surslisten');
+            this.webSocket.send('surslisten');
         };
         this.webSocket.onmessage = this.handleSocketMessage;
         this.webSocket.onclose = () => {
@@ -62,48 +52,46 @@ export default class App extends React.Component {
         }
     }
 
-    sendCommand(command) {
-        this.webSocket.send(command);
-    }
-
-    componentWillUnmount() {
-        this.state.timer.dispose();
-        this.state.layout.dispose();
-    }
-
-    handleInput(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        this.setState({
-            [target.name]: value,
-        });
+    sendHostCommand(command) {
+        this.webSocket.send(`host ${command}`);
     }
 
     handleSocketMessage(msg) {
         const tokens = msg.data.trim().split(/\s+/);
-        switch (tokens[0]) {
-        case Constants.Commands.START_TIMER:
-            this.onTimerStart(false);
-            break;
-        case Constants.Commands.PAUSE:
-            this.onTimerPause(false);
-            break;
-        case 'reset':
-            this.onTimerReset(false);
-            break;
-        case Constants.Commands.SPLIT:
-            this.onTimerSplit(false);
-            break;
-        case Constants.Commands.UNDO_SPLIT:
-            this.onTimerUndoSplit(false);
-            break;
-        case Constants.Commands.UNDO_ALL_PAUSES:
-            this.onTimerUndoAllPauses(false);
-            break;
-        case Constants.Commands.CONTROL_PASSWORD:
-            this.setState({ isConnected: true });
-            break;
-        default:
+        let offset = this.state.eventOffset;
+        if (tokens[0] === Constants.Commands.HOST_PREFIX) {
+            offset = 0;
+            tokens.shift();
+        }
+
+        const timerFunc = this.state.timer.commandToFunc(tokens[0]);
+        if (timerFunc) {
+            // Delay all timer functions.
+            if (offset > 0) {
+                const commandQueue = [...this.state.commandQueue];
+                commandQueue.push(tokens[0]);
+                this.setState({ commandQueue });
+
+                setTimeout(() => {
+                    timerFunc();
+                    const queue = [...this.state.commandQueue];
+                    queue.shift();
+                    this.setState({ commandQueue: queue });
+                }, offset);
+            } else {
+                timerFunc();
+            }
+        } else {
+            // Non-timer functions do not get delayed.
+            switch (tokens[0]) {
+            case Constants.Commands.CONTROL_PASSWORD:
+                this.setState({ isConnected: true });
+                break;
+            case Constants.Commands.SET_OFFSET:
+                this.setState({ eventOffset: parseInt(tokens[1], 10) });
+                break;
+            default:
+            }
         }
 
         const timeString = new Date().toTimeString();
@@ -114,74 +102,33 @@ export default class App extends React.Component {
         }
     }
 
-    onTimerStart(fromButton = true) {
-        if (this.state.timer.currentPhase() !== Constants.TimerPhase.NOT_RUNNING) {
-            return;
+    handleLocalMessage(event) {
+        const command = event.target.name;
+        const timerFunc = this.state.timer.commandToFunc(command);
+        if (timerFunc) {
+            this.sendHostCommand(command);
+            timerFunc();
+        } else if (command === Constants.Commands.SET_OFFSET) {
+            const time = this.state.timer.timeInMilliseconds;
+            this.sendHostCommand(`${command} ${time}`);
+            this.setState({ eventOffset: time });
         }
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.START_TIMER);
-        }
-        this.state.timer.split();
-    }
-
-    onTimerSplit(fromButton = true) {
-        if (this.state.timer.currentPhase() === Constants.TimerPhase.NOT_RUNNING) {
-            return;
-        }
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.SPLIT);
-        }
-        this.state.timer.split();
-    }
-
-    onTimerResume(fromButton = true) {
-        if (this.state.timer.currentPhase() !== Constants.TimerPhase.PAUSED) {
-            return;
-        }
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.RESUME);
-        }
-        this.state.timer.pause();
-    }
-
-    onTimerPause(fromButton = true) {
-        if (this.state.timer.currentPhase() === Constants.TimerPhase.PAUSED
-            || this.state.timer.currentPhase() === Constants.TimerPhase.NOT_RUNNING) {
-            return;
-        }
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.PAUSE);
-        }
-        this.state.timer.pause();
-    }
-
-    onTimerReset(fromButton = true) {
-        if (fromButton) {
-            this.sendCommand('reset');
-        }
-        this.state.timer.reset();
-    }
-
-    onTimerUndoSplit(fromButton = true) {
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.UNDO_SPLIT);
-        }
-        this.state.timer.undoSplit();
-    }
-
-    onTimerUndoAllPauses(fromButton = true) {
-        if (fromButton) {
-            this.sendCommand(Constants.Commands.UNDO_ALL_PAUSES);
-        }
-        this.state.timer.undoAllPauses();
-    }
-
-    onSetOffset() {
-
     }
 
     onTimerDoubleClick() {
         this.setState({ isControllerMode: !this.state.isControllerMode });
+    }
+
+    get eventOffsetString() {
+        const seconds = Math.round(this.state.eventOffset / 1000);
+        return `${seconds}`;
+    }
+
+    get commandQueueString() {
+        if (this.state.commandQueue.length === 0) {
+            return 'NIL';
+        }
+        return this.state.commandQueue.join(', ');
     }
 
     render() {
@@ -203,7 +150,7 @@ export default class App extends React.Component {
                     fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
                     fontColor={this.props.params.fontColor}
                     onDoubleClick={this.onTimerDoubleClick}
-                    getState={() => this.state.layout.stateAsJson(this.state.timer)} />
+                    getState={() => this.state.timer.time} />
                 <div style={controlsStyle}>
                     <table className="table-status">
                         <tbody>
@@ -213,7 +160,11 @@ export default class App extends React.Component {
                             </tr>
                             <tr>
                                 <th>COMMAND TIME OFFSET</th>
-                                <td>{this.state.eventOffset}</td>
+                                <td>{this.eventOffsetString}&thinsp;s</td>
+                            </tr>
+                            <tr>
+                                <th>COMMAND QUEUE</th>
+                                <td>{this.commandQueueString}</td>
                             </tr>
                             <tr>
                                 <th>LAST DOWNLINK COMMAND</th>
@@ -226,18 +177,18 @@ export default class App extends React.Component {
                         </tbody>
                     </table>
                     <div className="main-panel-row-1">
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerStart}>START</button>
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerSplit}>SPLIT</button>
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerUndoSplit}>UNDO SPLIT</button>
+                        <button name={Constants.Commands.START_TIMER} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>START</button>
+                        <button name={Constants.Commands.SPLIT} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>SPLIT</button>
+                        <button name={Constants.Commands.UNDO_SPLIT} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>UNDO SPLIT</button>
                     </div>
                     <div className="main-panel-row-2">
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerResume}>RESUME</button>
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerPause}>PAUSE</button>
-                        <button className="btn-primary btn-main-panel" onClick={this.onTimerUndoAllPauses}>UNDO ALL PAUSES</button>
+                        <button name={Constants.Commands.RESUME} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>RESUME</button>
+                        <button name={Constants.Commands.PAUSE} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>PAUSE</button>
+                        <button name={Constants.Commands.UNDO_ALL_PAUSES} className="btn-primary btn-main-panel" onClick={this.handleLocalMessage}>UNDO ALL PAUSES</button>
                     </div>
                     <div>
-                        <button className="btn-primary btn-danger-panel" onClick={this.onTimerReset}>RESET</button>
-                        <button className="btn-primary btn-danger-panel" onClick={this.onSetOffset}>OFFSET</button>
+                        <button name={Constants.Commands.RESET} className="btn-primary btn-danger-panel" onClick={this.handleLocalMessage}>RESET</button>
+                        <button name={Constants.Commands.SET_OFFSET} className="btn-primary btn-danger-panel" onClick={this.handleLocalMessage}>OFFSET</button>
                     </div>
                 </div>
             </div>

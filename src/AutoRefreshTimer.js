@@ -47,8 +47,7 @@ export default class AutoRefreshTimer extends React.Component {
     }
 
     updateTimer() {
-        const states = this.props.getState();
-        const timerState = states.find(state => state.hasOwnProperty('Timer')).Timer;
+        const timerState = this.props.getState();
         this.setState({
             timerTime: timerState.time,
             timerFraction: timerState.fraction,

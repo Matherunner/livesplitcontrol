@@ -95,9 +95,10 @@ table.table-status {
   border-top: 1px solid #fff;
   border-bottom: 1px solid #fff;
   margin: 0px auto 40px auto;
+  padding: 5px 0px 5px 0px;
   text-align: left;
   border-collapse: separate;
-  border-spacing: 14px 8px;
+  border-spacing: 14px 5px;
 }
 
 table.table-status td {
