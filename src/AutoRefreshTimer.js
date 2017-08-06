@@ -9,15 +9,37 @@ export default class AutoRefreshTimer extends React.Component {
         onDoubleClick: PropTypes.func,
     };
 
+    static getTimerStyles(fontSizeScale, fontColor) {
+        let timeFontSize = 64;
+        let fractionFontSize = 36;
+        if (fontSizeScale && !fontSizeScale.isNaN) {
+            timeFontSize *= fontSizeScale;
+            fractionFontSize *= fontSizeScale;
+        }
+        const color = `#${fontColor || 'ea7500'}`;
+        const timeStyle = { fontSize: `${timeFontSize}pt`, color };
+        const fractionStyle = { fontSize: `${fractionFontSize}pt`, color };
+        return { timeStyle, fractionStyle }
+    }
+
     constructor(props) {
         super(props);
 
         this.state = {
             timerTime: '',
             timerFraction: '',
+            ...AutoRefreshTimer.getTimerStyles(
+                this.props.fontSizeScale, this.props.fontColor),
         };
 
         this.runUpdate = this.runUpdate.bind(this);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            ...AutoRefreshTimer.getTimerStyles(
+                nextProps.fontSizeScale, nextProps.fontColor),
+        })
     }
 
     componentWillMount() {
@@ -39,21 +61,12 @@ export default class AutoRefreshTimer extends React.Component {
     }
 
     render() {
-        let timeFontSize = 64;
-        let fractionFontSize = 36;
-        if (this.props.fontSizeScale && !this.props.fontSizeScale.isNaN) {
-            timeFontSize *= this.props.fontSizeScale;
-            fractionFontSize *= this.props.fontSizeScale;
-        }
-        const color = `#${this.props.fontColor || 'ea7500'}`;
-        const timeStyle = { fontSize: `${timeFontSize}pt`, color };
-        const fractionStyle = { fontSize: `${fractionFontSize}pt`, color };
-
+        const { timeStyle, timerTime, fractionStyle, timerFraction } = this.state;
         return (
             <div className="container-timer" onDoubleClick={this.props.onDoubleClick}>
                 <div>
-                    <span className="timer-time" style={timeStyle}>{this.state.timerTime}</span>
-                    <span className="timer-fraction" style={fractionStyle}>{this.state.timerFraction}</span>
+                    <span className="timer-time" style={timeStyle}>{timerTime}</span>
+                    <span className="timer-fraction" style={fractionStyle}>{timerFraction}</span>
                 </div>
             </div>
         );

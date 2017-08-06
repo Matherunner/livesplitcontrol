@@ -182,6 +182,7 @@ export default class App extends React.Component {
         const mainContainerStyle = {
             background: this.state.isControllerMode ? '#000' : 'transparent',
             display: this.state.isControllerMode ? 'block' : 'flex',
+            overflow: this.state.isControllerMode ? 'auto' : 'hidden',
         };
 
         return (

@@ -12,6 +12,7 @@ body {
   padding: 0;
   color: #fff;
   font-family: 'Roboto', sans-serif;
+  overflow: hidden;
 }
 
 div.main-container {
