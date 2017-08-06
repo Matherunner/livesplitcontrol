@@ -24,6 +24,19 @@ div.main-container {
   align-items: center;
 }
 
+div.login-container {
+  height: 100%;
+  width: 100%;
+  background-color: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+form.login-form {
+  text-align: center;
+  margin-top: 150px;
+}
+
 div.container-timer {
   padding-top: 70px;
   margin: 0px auto 70px auto;
@@ -60,27 +73,34 @@ div.container-timer {
   margin-bottom: 90px;
 }
 
-.btn, .btn-primary {
+.btn-primary {
   padding: 12px;
   border-radius: 6px;
-  font-size: 100%;
-   min-width: 13em;
-}
-
-.btn-primary {
   border: 1px solid #fff;
+  font-size: 100%;
+  min-width: 13em;
   background-color: inherit;
   color: #fff;
 }
 
-.btn-primary:hover {
+.btn-primary:disabled {
+  color: #888;
+  border-color: #888;
+}
+
+.btn-primary:hover:enabled {
   background-color: #fff;
   color: #000;
 }
 
-.btn-primary:active {
+.btn-primary:active:enabled {
   background-color: #bbb;
   box-shadow: inset 1px 1px 4px black;
+}
+
+.btn-primary:focus:enabled {
+  outline: 1px solid #fff;
+  outline-offset: 1px;
 }
 
 .btn-main-panel {
@@ -103,6 +123,10 @@ table.table-status {
 
 table.table-status td {
   width: 30em;
+  max-width: 30em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   vertical-align: text-top;
 }
 
@@ -110,4 +134,29 @@ table.table-status th {
   padding-right: 8px;
   font-weight: 400;
   vertical-align: text-top;
+}
+
+input.login-password-input {
+  font-size: 100%;
+  background-color: #000;
+  color: #fff;
+  outline: 0;
+  padding: 10px;
+  border: 2px solid #fff;
+  width: 20em;
+  display: block;
+  margin: 0px auto 10px auto;
+}
+
+input.login-password-input:disabled {
+  color: #888;
+  border-color: #888;
+}
+
+.login-password-label {
+  margin: 0px auto 10px auto;
+}
+
+.login-status-text {
+  margin: 0px auto 30px auto;
 }
