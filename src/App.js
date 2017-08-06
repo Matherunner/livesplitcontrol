@@ -45,11 +45,20 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        this.webSocket = new WebSocket('wss://play.sourceruns.org:12346', 'rust-websocket');
+        this.setUpWebSockets();
+    }
+
+    setUpWebSockets() {
+        const url = this.props.params.wsUrl || 'wss://play.sourceruns.org:12346';
+        this.webSocket = new WebSocket(url, 'rust-websocket');
         this.webSocket.onopen = () => {
             this.sendCommand('surslisten');
         };
         this.webSocket.onmessage = this.handleSocketMessage;
+        this.webSocket.onclose = () => {
+            this.setState({ isConnected: false });
+            this.setUpWebSockets();
+        }
     }
 
     sendCommand(command) {
