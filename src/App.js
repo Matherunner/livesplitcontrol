@@ -21,6 +21,7 @@ export default class App extends React.Component {
 
         let eventOffset = parseInt(this.props.params.offset, 10);
         eventOffset = isNaN(eventOffset) ? 0 : eventOffset;
+        eventOffset = Math.max(eventOffset, 0);
 
         this.state = {
             timer: new TimerWrapper(run),
