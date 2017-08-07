@@ -29,8 +29,18 @@ export default class Controller extends React.Component {
         this.onTimerDoubleClick = this.onTimerDoubleClick.bind(this);
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.hideDiagnosticTime
+            && nextProps.timerStatus !== Constants.TimerPhase.NOT_RUNNING) {
+            // The timer has started, so stop showing the diagnostic time at once.
+            clearTimeout(this.hideDiagnosticTime);
+            this.hideDiagnosticTime = null;
+            this.setState({ showDiagnosticTime: false });
+        }
+    }
+
     componentDidMount() {
-        setTimeout(() => {
+        this.hideDiagnosticTime = setTimeout(() => {
             this.setState({ showDiagnosticTime: false });
         }, 1500);
     }
