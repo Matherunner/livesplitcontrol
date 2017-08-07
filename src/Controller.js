@@ -73,6 +73,7 @@ export default class Controller extends React.Component {
                     fontColor={this.props.params.fontColor}
                     onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.props.timer.time} />
+
                 <div style={controlsStyle}>
                     <table className="table-status">
                         <tbody>
@@ -103,19 +104,44 @@ export default class Controller extends React.Component {
                             </tr>
                         </tbody>
                     </table>
+
                     <div className="main-panel-row-1">
-                        <button name={Constants.Commands.START_TIMER} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>START</button>
-                        <button name={Constants.Commands.SPLIT} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>SPLIT</button>
-                        <button name={Constants.Commands.UNDO_SPLIT} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>UNDO SPLIT</button>
+                        <button
+                            name={Constants.Commands.START_TIMER}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>START</button>
+                        <button
+                            name={Constants.Commands.SPLIT}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>SPLIT</button>
+                        <button
+                            name={Constants.Commands.UNDO_SPLIT}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>UNDO SPLIT</button>
                     </div>
                     <div className="main-panel-row-2">
-                        <button name={Constants.Commands.RESUME} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>RESUME</button>
-                        <button name={Constants.Commands.PAUSE} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>PAUSE</button>
-                        <button name={Constants.Commands.UNDO_ALL_PAUSES} className="btn-primary btn-main-panel" onClick={this.handleButtonClick}>UNDO ALL PAUSES</button>
+                        <button
+                            name={Constants.Commands.RESUME}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>RESUME</button>
+                        <button
+                            name={Constants.Commands.PAUSE}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>PAUSE</button>
+                        <button
+                            name={Constants.Commands.UNDO_ALL_PAUSES}
+                            className="btn-primary btn-main-panel"
+                            onClick={this.handleButtonClick}>UNDO ALL PAUSES</button>
                     </div>
                     <div>
-                        <button name={Constants.Commands.RESET} className="btn-primary btn-danger-panel" onClick={this.handleButtonClick}>RESET</button>
-                        <button name={Constants.Commands.SET_OFFSET} className="btn-primary btn-danger-panel" onClick={this.handleButtonClick}>OFFSET</button>
+                        <button
+                            name={Constants.Commands.RESET}
+                            className="btn-primary btn-danger-panel"
+                            onClick={this.handleButtonClick}>RESET</button>
+                        <button
+                            name={Constants.Commands.SET_OFFSET}
+                            className="btn-primary btn-danger-panel"
+                            onClick={this.handleButtonClick}>OFFSET</button>
                     </div>
                 </div>
             </div>

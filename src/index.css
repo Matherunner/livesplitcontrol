@@ -32,6 +32,12 @@ div.login-container {
   overflow: hidden;
 }
 
+.login-help-note {
+  text-align: left;
+  width: 480px;
+  margin: 60px auto 0px auto;
+}
+
 form.login-form {
   text-align: center;
   margin-top: 150px;

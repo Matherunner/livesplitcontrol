@@ -70,7 +70,9 @@ export default class App extends React.Component {
     }
 
     sendHostCommand(command) {
-        this.webSocket.send(`host ${command}`);
+        if (this.state.socketStatus === Constants.Connection.CONNECTED) {
+            this.webSocket.send(`host ${command}`);
+        }
     }
 
     handleLocalMessage(command) {

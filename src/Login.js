@@ -55,6 +55,11 @@ export default class Login extends React.Component {
                         disabled={this.state.password.length === 0 || inputDisabled}
                         className="btn-primary"
                         onClick={this.onLogin}>LOGIN</button>
+                    <div className="login-help-note">
+                        Add the ?password=&lt;PASSWORD&gt; query parameter to the URL to
+                        authenticate automatically. Never show the URL publicly or you
+                        will expose the password.
+                    </div>
                 </form>
             </div>
         );
