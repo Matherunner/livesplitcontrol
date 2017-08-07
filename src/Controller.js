@@ -21,10 +21,17 @@ export default class Controller extends React.Component {
 
         this.state = {
             isControllerMode: false,
+            showDiagnosticTime: true,
         };
 
         this.handleButtonClick = this.handleButtonClick.bind(this);
         this.onTimerDoubleClick = this.onTimerDoubleClick.bind(this);
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({ showDiagnosticTime: false });
+        }, 1500);
     }
 
     handleButtonClick(event) {
@@ -53,6 +60,12 @@ export default class Controller extends React.Component {
         }).join(', ');
     }
 
+    get timerState() {
+        return this.state.showDiagnosticTime
+            ? this.props.timer.diagnosticTime
+            : this.props.timer.time;
+    }
+
     render() {
         const connectionStatus = Constants.Connection.statusToString(this.props.socketStatus);
         const statusColor = this.props.socketStatus === Constants.Connection.CONNECTED
@@ -72,7 +85,7 @@ export default class Controller extends React.Component {
                     fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
                     fontColor={this.props.params.fontColor}
                     onDoubleClick={this.onTimerDoubleClick}
-                    getState={() => this.props.timer.time} />
+                    getState={() => this.timerState} />
 
                 <div style={controlsStyle}>
                     <table className="table-status">

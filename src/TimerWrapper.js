@@ -18,6 +18,10 @@ export default class TimerWrapper {
         return { time: timerState.time, fraction: timerState.fraction };
     }
 
+    get diagnosticTime() {
+        return { time: '9:59:59', fraction: '.99' };
+    }
+
     get timeInMilliseconds() {
         const time = this.time;
         let milliseconds = parseInt(time.fraction.slice(1), 10) * 10;
