@@ -9,6 +9,7 @@ export default class Controller extends React.Component {
         onLocalMessage: PropTypes.func,
         timer: PropTypes.object,
         socketStatus: PropTypes.string,
+        timerStatus: PropTypes.number,
         lastMessage: PropTypes.string,
         lastControlPassword: PropTypes.string,
         eventOffset: PropTypes.number,
@@ -70,6 +71,8 @@ export default class Controller extends React.Component {
         const connectionStatus = Constants.Connection.statusToString(this.props.socketStatus);
         const statusColor = this.props.socketStatus === Constants.Connection.CONNECTED
             ? '#fff' : '#e1d666';
+        const timerStatus = Constants.TimerPhase.phaseToString(this.props.timerStatus);
+
         const controlsStyle = {
             display: this.state.isControllerMode ? 'block' : 'none',
         };
@@ -93,6 +96,10 @@ export default class Controller extends React.Component {
                             <tr>
                                 <th>CONNECTION STATUS</th>
                                 <td style={{ color: statusColor }}>{connectionStatus}</td>
+                            </tr>
+                            <tr>
+                                <th>TIMER STATUS</th>
+                                <td>{timerStatus}</td>
                             </tr>
                             <tr>
                                 <th>COMMAND TIME OFFSET</th>

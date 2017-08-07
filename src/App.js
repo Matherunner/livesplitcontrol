@@ -26,8 +26,9 @@ export default class App extends React.Component {
         eventOffset = Math.max(eventOffset, 0);
 
         this.state = {
-            timer: new TimerWrapper(run),
+            timer: new TimerWrapper(run, this.onTimerPhaseUpdate.bind(this)),
             showController: false,
+            timerStatus: Constants.TimerPhase.NOT_RUNNING,
             socketStatus: Constants.Connection.PENDING_INPUT,
             lastMessage: 'NIL',
             lastControlPassword: 'NIL',
@@ -45,6 +46,10 @@ export default class App extends React.Component {
         if (password && password.length > 0) {
             this.onLogin(password);
         }
+    }
+
+    onTimerPhaseUpdate(phase) {
+        this.setState({ timerStatus: phase });
     }
 
     setupWebSockets(url, password) {
@@ -153,6 +158,7 @@ export default class App extends React.Component {
                 onLocalMessage={this.handleLocalMessage}
                 timer={this.state.timer}
                 socketStatus={this.state.socketStatus}
+                timerStatus={this.state.timerStatus}
                 lastMessage={this.state.lastMessage}
                 lastControlPassword={this.state.lastControlPassword}
                 eventOffset={this.state.eventOffset}

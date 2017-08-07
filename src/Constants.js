@@ -6,6 +6,20 @@ export const TimerPhase = {
     ENDED: 2,
     PAUSED: 3,
 };
+TimerPhase.phaseToString = (phase) => {
+    switch (phase) {
+    case TimerPhase.NOT_RUNNING:
+        return 'Not Running';
+    case TimerPhase.RUNNING:
+        return 'Running';
+    case TimerPhase.ENDED:
+        return 'Ended';
+    case TimerPhase.PAUSED:
+        return 'Paused';
+    default:
+        return phase;
+    }
+};
 
 export const Commands = {
     START_TIMER: 'starttimer',

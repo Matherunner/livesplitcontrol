@@ -2,10 +2,11 @@ import * as Core from 'livesplit-core';
 import * as Constants from './Constants';
 
 export default class TimerWrapper {
-    constructor(run) {
+    constructor(run, onPhaseUpdate) {
         this.timer = Core.Timer.new(run);
         this.layout = Core.Layout.new();
         this.layout.push(Core.TimerComponent.new().intoGeneric());
+        this.onPhaseUpdate = onPhaseUpdate;
     }
 
     get currentPhase() {
@@ -45,6 +46,12 @@ export default class TimerWrapper {
         return milliseconds;
     }
 
+    callPhaseUpdate() {
+        if (this.onPhaseUpdate) {
+            this.onPhaseUpdate(this.currentPhase);
+        }
+    }
+
     commandToFunc(command) {
         switch (command) {
         case Constants.Commands.START_TIMER:
@@ -69,18 +76,21 @@ export default class TimerWrapper {
     start() {
         if (this.currentPhase === Constants.TimerPhase.NOT_RUNNING) {
             this.timer.split();
+            this.callPhaseUpdate();
         }
     }
 
     split() {
         if (this.currentPhase !== Constants.TimerPhase.NOT_RUNNING) {
             this.timer.split();
+            this.callPhaseUpdate();
         }
     }
 
     resume() {
         if (this.currentPhase === Constants.TimerPhase.PAUSED) {
             this.timer.pause();
+            this.callPhaseUpdate();
         }
     }
 
@@ -88,18 +98,22 @@ export default class TimerWrapper {
         if (this.currentPhase !== Constants.TimerPhase.PAUSED
             && this.currentPhase !== Constants.TimerPhase.NOT_RUNNING) {
             this.timer.pause();
+            this.callPhaseUpdate();
         }
     }
 
     reset() {
         this.timer.reset();
+        this.callPhaseUpdate();
     }
 
     undoSplit() {
         this.timer.undoSplit();
+        this.callPhaseUpdate();
     }
 
     undoAllPauses() {
         this.timer.undoAllPauses();
+        this.callPhaseUpdate();
     }
 }
