@@ -5,6 +5,7 @@ export default class AutoRefreshTimer extends React.Component {
     static propTypes = {
         fontSizeScale: PropTypes.number,
         fontColor: PropTypes.string,
+        textAlign: PropTypes.string,
         getState: PropTypes.func,
         onDoubleClick: PropTypes.func,
     };
@@ -25,11 +26,19 @@ export default class AutoRefreshTimer extends React.Component {
     constructor(props) {
         super(props);
 
+        let justifyContent = 'center';
+        if (this.props.textAlign === 'left') {
+            justifyContent = 'flex-start';
+        } else if (this.props.textAlign === 'right') {
+            justifyContent = 'flex-end';
+        }
+
         this.state = {
             timerTime: '',
             timerFraction: '',
             ...AutoRefreshTimer.getTimerStyles(
                 this.props.fontSizeScale, this.props.fontColor),
+            justifyContent,
         };
 
         this.runUpdate = this.runUpdate.bind(this);
@@ -60,9 +69,9 @@ export default class AutoRefreshTimer extends React.Component {
     }
 
     render() {
-        const { timeStyle, timerTime, fractionStyle, timerFraction } = this.state;
+        const { timeStyle, timerTime, fractionStyle, timerFraction, justifyContent } = this.state;
         return (
-            <div className="container-timer" onDoubleClick={this.props.onDoubleClick}>
+            <div className="container-timer" style={{ justifyContent }} onDoubleClick={this.props.onDoubleClick}>
                 <div>
                     <span className="timer-time" style={timeStyle}>{timerTime}</span>
                     <span className="timer-fraction" style={fractionStyle}>{timerFraction}</span>

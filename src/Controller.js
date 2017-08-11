@@ -97,6 +97,7 @@ export default class Controller extends React.Component {
                 <AutoRefreshTimer
                     fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
                     fontColor={this.props.params.fontColor}
+                    textAlign={this.props.params.textAlign}
                     onDoubleClick={this.onTimerDoubleClick}
                     getState={() => this.timerState} />
 

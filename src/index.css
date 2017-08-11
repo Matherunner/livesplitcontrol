@@ -21,7 +21,6 @@ div.main-container {
   text-align: center;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
 }
 
 div.login-container {

@@ -11,6 +11,7 @@ Certain aspects of the timer can be customised/modified from their defaults via 
 | Query Parameter   | Input                        |  Description                              |
 |:----------------- |:---------------------------- |:----------------------------------------- |
 | password          | String                       | Password for server authentication        |
+| textAlign         | left, right, or center       | Set the text alignment of the timer       |
 | fontSizeScale     | Positive number              | Scale the timer font size by input        |
 | fontColor         | RGB in hex (e.g. acff83)     | Set the timer font colour                 |
 | offset            | Positive integer in ms       | Set the command time offset               |
