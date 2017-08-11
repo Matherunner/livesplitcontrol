@@ -102,6 +102,8 @@ export default class App extends React.Component {
 
         const timerFunc = this.state.timer.commandToFunc(tokens[0]);
         if (timerFunc) {
+            const args = tokens.slice(1);
+
             // Delay all timer functions.
             if (offset > 0) {
                 const commandQueue = [...this.state.commandQueue];
@@ -112,13 +114,13 @@ export default class App extends React.Component {
                 this.setState({ commandQueue });
 
                 setTimeout(() => {
-                    timerFunc();
+                    timerFunc.apply(null, args);
                     const queue = [...this.state.commandQueue];
                     queue.shift();
                     this.setState({ commandQueue: queue });
                 }, offset);
             } else {
-                timerFunc();
+                timerFunc.apply(null, args);
             }
         } else {
             // Non-timer functions do not get delayed.

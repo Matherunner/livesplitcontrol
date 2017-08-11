@@ -29,6 +29,7 @@ export const Commands = {
     SPLIT: 'split',
     UNDO_SPLIT: 'unsplit',
     UNDO_ALL_PAUSES: 'undoallpauses',
+    RUN_OFFSET: 'runoffset',
 
     HOST_PREFIX: 'host',
     SET_OFFSET: 'set_offset',

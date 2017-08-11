@@ -68,6 +68,8 @@ export default class TimerWrapper {
             return this.undoSplit.bind(this);
         case Constants.Commands.UNDO_ALL_PAUSES:
             return this.undoAllPauses.bind(this);
+        case Constants.Commands.RUN_OFFSET:
+            return this.setRunOffset.bind(this);
         default:
             return null;
         }
@@ -104,6 +106,7 @@ export default class TimerWrapper {
 
     reset() {
         this.timer.reset();
+        this.setRunOffset(0);
         this.callPhaseUpdate();
     }
 
@@ -115,5 +118,15 @@ export default class TimerWrapper {
     undoAllPauses() {
         this.timer.undoAllPauses();
         this.callPhaseUpdate();
+    }
+
+    setRunOffset(offset) {
+        if (this.currentPhase === Constants.TimerPhase.NOT_RUNNING) {
+            const numOffset = parseInt(offset, 10);
+            const strOffset = (numOffset / 1000).toFixed(2);
+            const editor = Core.RunEditor.new(this.timer.getRun());
+            editor.parseAndSetOffset(strOffset);
+            editor.close();
+        }
     }
 }
