@@ -126,7 +126,7 @@ export default class TimerWrapper {
             const strOffset = (numOffset / 1000).toFixed(2);
             const editor = Core.RunEditor.new(this.timer.getRun());
             editor.parseAndSetOffset(strOffset);
-            editor.close();
+            this.timer = new Core.Timer.new(editor.close());
         }
     }
 }
