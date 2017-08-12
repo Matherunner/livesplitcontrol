@@ -48,7 +48,7 @@ export default class Login extends React.Component {
                         disabled={inputDisabled}
                         className="login-password-input"
                         type="password"
-                        value={this.props.password}
+                        value={this.state.password}
                         onChange={this.handlePasswordChange} />
                     <div className="login-status-text">{statusText}</div>
                     <button
