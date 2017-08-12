@@ -26,19 +26,12 @@ export default class AutoRefreshTimer extends React.Component {
     constructor(props) {
         super(props);
 
-        let justifyContent = 'center';
-        if (this.props.textAlign === 'left') {
-            justifyContent = 'flex-start';
-        } else if (this.props.textAlign === 'right') {
-            justifyContent = 'flex-end';
-        }
-
         this.state = {
             timerTime: '',
             timerFraction: '',
             ...AutoRefreshTimer.getTimerStyles(
                 this.props.fontSizeScale, this.props.fontColor),
-            justifyContent,
+            timerContainerStyle: this.timerContainerStyle,
         };
 
         this.runUpdate = this.runUpdate.bind(this);
@@ -55,6 +48,17 @@ export default class AutoRefreshTimer extends React.Component {
         this.runUpdate();
     }
 
+    get timerContainerStyle() {
+        let justifyContent = 'center';
+        if (this.props.textAlign === 'left') {
+            justifyContent = 'flex-start';
+        } else if (this.props.textAlign === 'right') {
+            justifyContent = 'flex-end';
+        }
+        const margin = justifyContent === 'center' ? 'auto' : 0;
+        return { justifyContent, marginLeft: margin, marginRight: margin };
+    }
+
     updateTimer() {
         const timerState = this.props.getState();
         this.setState({
@@ -69,9 +73,12 @@ export default class AutoRefreshTimer extends React.Component {
     }
 
     render() {
-        const { timeStyle, timerTime, fractionStyle, timerFraction, justifyContent } = this.state;
+        const { timeStyle, timerTime, fractionStyle, timerFraction, timerContainerStyle } = this.state;
         return (
-            <div className="container-timer" style={{ justifyContent }} onDoubleClick={this.props.onDoubleClick}>
+            <div
+                className="container-timer"
+                style={timerContainerStyle}
+                onDoubleClick={this.props.onDoubleClick}>
                 <div>
                     <span className="timer-time" style={timeStyle}>{timerTime}</span>
                     <span className="timer-fraction" style={fractionStyle}>{timerFraction}</span>
