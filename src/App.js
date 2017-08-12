@@ -70,8 +70,11 @@ export default class App extends React.Component {
                 });
                 return;
             }
-            this.setupWebSockets(url, password);
-        }
+
+            setTimeout(() => {
+                this.setupWebSockets(url, password);
+            }, 1000);
+        };
     }
 
     sendHostCommand(command) {
