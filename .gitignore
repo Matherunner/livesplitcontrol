@@ -21,4 +21,5 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore livesplit bindings because we're generating it
-/src/livesplit.js
+livesplit.ts
+*.wasm
