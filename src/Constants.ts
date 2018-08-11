@@ -22,6 +22,28 @@ export function phaseToString(phase: TimerPhase) {
   }
 }
 
+export const enum CoreState {
+  NOT_LOADED,
+  LOADING,
+  LOADED,
+  FAILED,
+}
+
+export function coreStateToString(state: CoreState) {
+  switch (state) {
+    case CoreState.NOT_LOADED:
+      return 'LIVESPLIT CORE WAITING TO LOAD';
+    case CoreState.LOADING:
+      return 'LOADING LIVESPLIT CORE';
+    case CoreState.LOADED:
+      return 'LIVESPLIT CORE LOADED';
+    case CoreState.FAILED:
+      return 'LIVESPLIT CORE FAILED TO LOAD';
+    default:
+      return '';
+  }
+}
+
 export const enum Commands {
   START_TIMER = 'starttimer',
   RESUME = 'resume',

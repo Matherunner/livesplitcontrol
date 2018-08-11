@@ -8,7 +8,7 @@ To be used in conjunction with [LiveSplit.NetControlClient](https://github.com/Y
 
 Upon launching, type in the server password. After a successful authentication, there may be some delay in loading up the timer due to the size of the WebAssembly Livesplit core. The timer shows up in presentation mode by default. Double click on the timer text to toggle between presentation and controller mode.
 
-Certain aspects of the timer can be customised/modified from their defaults via URL query parameters. Remember to **percent encode** the input values, especially for ``wsUrl``.
+Certain aspects of the timer can be customised/modified from their defaults via URL query parameters. Remember to **percent encode** the input values, especially for ``wsUrl``. The parameter names are *case sensitive*.
 
 | Query Parameter   | Input                        |  Description                              |
 |:----------------- |:---------------------------- |:----------------------------------------- |

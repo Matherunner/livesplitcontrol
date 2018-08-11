@@ -11,9 +11,9 @@ export interface IProps {
 interface IState {
   timerFraction: string,
   timerTime: string,
-  timerContainerStyle: object,
-  timeStyle: object,
-  fractionStyle: object,
+  timerContainerStyle: React.CSSProperties,
+  timeStyle: React.CSSProperties,
+  fractionStyle: React.CSSProperties,
 }
 
 export default class AutoRefreshTimer extends React.Component<IProps, IState> {

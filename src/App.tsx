@@ -7,68 +7,70 @@ import Controller from './Controller';
 import Login from './Login';
 import TimerWrapper from './TimerWrapper';
 
-enum CoreState {
-  NOT_LOADED, LOADING, LOADED, FAILED,
-};
-
 export interface ICommandItem {
   command: string,
   time: number,
 };
 
-export interface IProps {
-  // FIXME: 
-  params: any,
-}
-
 interface IState {
   timer?: TimerWrapper,
-  showController: boolean,
   timerStatus: Constants.TimerPhase,
   socketStatus: Constants.Connection,
   lastMessage: string,
   lastControlPassword: string,
   eventOffset: number,
   commandQueue: ICommandItem[],
-  coreState: CoreState,
+  coreState: Constants.CoreState,
   coreLoadFailure?: Error,
 }
 
-export default class App extends React.Component<IProps, IState> {
+export default class App extends React.Component<{}, IState> {
   private webSocket?: WebSocket;
 
-  constructor(props: IProps) {
+  constructor(props: {}) {
     super(props);
 
-    let eventOffset = parseInt(this.props.params.offset, 10);
-    eventOffset = Number.isNaN(eventOffset) ? 0 : eventOffset;
-    eventOffset = Math.max(eventOffset, 0);
+    const offsetString =
+      new URL(window.location.href).searchParams.get('offset');
+    let eventOffset = offsetString ? parseInt(offsetString, 10) : 0;
+    eventOffset = Number.isNaN(eventOffset) ? 0 : Math.max(0, eventOffset);
 
     this.state = {
-      showController: false,
       timerStatus: Constants.TimerPhase.NOT_RUNNING,
       socketStatus: Constants.Connection.PENDING_INPUT,
       lastMessage: 'None',
       lastControlPassword: 'None',
       eventOffset,
       commandQueue: [],
-      coreState: CoreState.NOT_LOADED,
+      coreState: Constants.CoreState.NOT_LOADED,
     };
   }
 
   public componentWillMount() {
-    const password = this.props.params.password;
+    this.loadLSCore();
+
+    const { searchParams } = new URL(window.location.href)
+    const password = searchParams.get('password');
     if (password) {
-      this.onLogin(password);
+      const serverUrl = searchParams.get('wsUrl') || Constants.DEFAULT_WEBSOCKS_URL;
+      this.onLogin(serverUrl, password);
     }
   }
 
   public render() {
-    if (!this.state.showController) {
+    const showController =
+      this.state.socketStatus === Constants.Connection.CONNECTED &&
+      this.state.coreState === Constants.CoreState.LOADED;
+    if (!showController) {
+      const { searchParams } = new URL(window.location.href);
+
       return (
         <Login
           onLogin={this.onLogin}
           socketStatus={this.state.socketStatus}
+          coreState={this.state.coreState}
+          password={searchParams.get('password')}
+          serverUrl={searchParams.get('wsUrl')}
         />
       );
     }
@@ -83,22 +85,24 @@ export default class App extends React.Component<IProps, IState> {
         lastControlPassword={this.state.lastControlPassword}
         eventOffset={this.state.eventOffset}
         commandQueue={this.state.commandQueue}
-        params={this.props.params}
       />
     );
   }
 
   private async loadLSCore() {
-    if (this.state.coreState === CoreState.LOADED ||
-        this.state.coreState === CoreState.LOADING) {
+    if (this.state.coreState === Constants.CoreState.LOADED ||
+        this.state.coreState === Constants.CoreState.LOADING) {
       return;
     }
 
-    this.setState({ coreState: CoreState.LOADING });
+    this.setState({ coreState: Constants.CoreState.LOADING });
     try {
       await LSCore.load(LSWASM);
     } catch (err) {
-      this.setState({ coreState: CoreState.FAILED, coreLoadFailure: err });
+      this.setState({
+        coreState: Constants.CoreState.FAILED,
+        coreLoadFailure: err,
+      });
       return;
     }
 
@@ -109,8 +113,7 @@ export default class App extends React.Component<IProps, IState> {
 
     this.setState({
       timer: new TimerWrapper(run, this.onTimerPhaseUpdate),
-      coreState: CoreState.LOADED,
-      showController: true,
+      coreState: Constants.CoreState.LOADED,
     });
   }
 
@@ -132,7 +135,6 @@ export default class App extends React.Component<IProps, IState> {
         // so we've probably given it an incorrect password.
         this.setState({
           socketStatus: Constants.Connection.WRONG_PASSWORD,
-          showController: false,
         });
         return;
       }
@@ -203,7 +205,6 @@ export default class App extends React.Component<IProps, IState> {
           this.setState({
             socketStatus: Constants.Connection.CONNECTED,
           });
-          this.loadLSCore();
           break;
         case Constants.Commands.SET_OFFSET:
           this.setState({ eventOffset: parseInt(tokens[1], 10) });
@@ -226,8 +227,7 @@ export default class App extends React.Component<IProps, IState> {
     }
   }
 
-  private onLogin = (password: string) => {
-    const url = this.props.params.wsUrl || Constants.DEFAULT_WEBSOCKS_URL;
-    this.setupWebSockets(url, password);
+  private onLogin = (serverUrl: string, password: string) => {
+    this.setupWebSockets(serverUrl, password);
   }
 }

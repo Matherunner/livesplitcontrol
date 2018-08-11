@@ -13,21 +13,30 @@ export interface IProps {
   lastMessage: string,
   lastControlPassword: string,
   eventOffset: number,
-  // FIXME: change this
   commandQueue: ICommandItem[],
-  params: any,
 }
 
 interface IState {
   isControllerMode: boolean,
   showDiagnosticTime: boolean,
+  timerFontScale: number,
+  timerFontColor: string,
+  timerTextAlign: string,
 }
 
 export default class Controller extends React.Component<IProps, IState> {
-  public state = {
-    isControllerMode: false,
-    showDiagnosticTime: true,
-  };
+  private static initState(): IState {
+    const { searchParams } = new URL(window.location.href);
+    return {
+      isControllerMode: false,
+      showDiagnosticTime: true,
+      timerFontScale: parseFloat(searchParams.get('fontSizeScale') || '1'),
+      timerFontColor: searchParams.get('fontColor') || '',
+      timerTextAlign: searchParams.get('textAlign') || '',
+    };
+  }
+
+  public state = Controller.initState();
 
   private hideDiagnosticTime?: NodeJS.Timer;
 
@@ -81,9 +90,9 @@ export default class Controller extends React.Component<IProps, IState> {
     return (
       <div className="main-container" style={mainContainerStyle}>
         <AutoRefreshTimer
-          fontSizeScale={parseFloat(this.props.params.fontSizeScale)}
-          fontColor={this.props.params.fontColor}
-          textAlign={this.props.params.textAlign}
+          fontSizeScale={this.state.timerFontScale}
+          fontColor={this.state.timerFontColor}
+          textAlign={this.state.timerTextAlign}
           onDoubleClick={this.onTimerDoubleClick}
           getState={this.getTimerState}
         />

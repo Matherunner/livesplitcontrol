@@ -1,3 +1,8 @@
+::selection {
+  background-color: #fff;
+  color: #000;
+}
+
 html {
   background: transparent;
 }
@@ -87,6 +92,7 @@ div.container-timer {
   min-width: 13em;
   background-color: inherit;
   color: #fff;
+  user-select: none;
 }
 
 .btn-primary:disabled {
@@ -142,7 +148,7 @@ table.table-status th {
   vertical-align: text-top;
 }
 
-input.login-password-input {
+input.login-text-input {
   font-size: 100%;
   background-color: #000;
   color: #fff;
@@ -154,9 +160,13 @@ input.login-password-input {
   margin: 0px auto 10px auto;
 }
 
-input.login-password-input:disabled {
+input.login-text-input:disabled {
   color: #888;
   border-color: #888;
+}
+
+input.login-server-input {
+  margin-bottom: 30px;
 }
 
 .login-password-label {
@@ -164,5 +174,15 @@ input.login-password-input:disabled {
 }
 
 .login-status-text {
+  margin: 0px auto 10px auto;
+}
+
+.login-wasm-text {
   margin: 0px auto 30px auto;
+}
+
+a {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
 }
