@@ -106,8 +106,7 @@ div.container-timer {
 }
 
 .btn-primary:active:enabled {
-  background-color: #bbb;
-  box-shadow: inset 1px 1px 4px black;
+  background-color: #aaa;
 }
 
 .btn-primary:focus:enabled {

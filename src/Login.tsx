@@ -29,7 +29,8 @@ export default class Login extends React.Component<IProps, IState> {
     const coreStateText = Constants.coreStateToString(this.props.coreState);
     const inputDisabled =
       this.props.socketStatus !== Constants.Connection.PENDING_INPUT &&
-      this.props.socketStatus !== Constants.Connection.WRONG_PASSWORD;
+      this.props.socketStatus !== Constants.Connection.WRONG_PASSWORD &&
+      this.props.socketStatus !== Constants.Connection.CANNOT_CONNECT;
 
     return (
       <div className="login-container">
@@ -43,6 +44,7 @@ export default class Login extends React.Component<IProps, IState> {
             className="login-text-input login-server-input"
             spellCheck={false}
             value={this.state.serverUrl}
+            onFocus={this.handleSelectAll}
             onChange={this.handleServerChange}
             onBlur={this.handleServerBlur}
           />
@@ -55,6 +57,7 @@ export default class Login extends React.Component<IProps, IState> {
             className="login-text-input"
             type="password"
             value={this.state.password}
+            onFocus={this.handleSelectAll}
             onChange={this.handlePasswordChange}
           />
           <div className="login-status-text">
@@ -92,6 +95,10 @@ export default class Login extends React.Component<IProps, IState> {
 
   private handleServerBlur = (event: React.FocusEvent) => {
     this.setState({ serverUrl: this.state.serverUrl.trim() });
+  }
+
+  private handleSelectAll = (event: React.FocusEvent) => {
+    (event.target as HTMLInputElement).select();
   }
 
   private onLogin = (event: React.FormEvent) => {

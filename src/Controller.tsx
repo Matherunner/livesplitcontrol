@@ -40,9 +40,10 @@ export default class Controller extends React.Component<IProps, IState> {
 
   private hideDiagnosticTime?: NodeJS.Timer;
 
+  // TODO: migrate to getDerivedStateFromProps
   public componentWillReceiveProps(nextProps: IProps) {
-    if (this.hideDiagnosticTime
-        && nextProps.timerStatus !== Constants.TimerPhase.NOT_RUNNING) {
+    if (this.hideDiagnosticTime &&
+        nextProps.timerStatus !== Constants.TimerPhase.NOT_RUNNING) {
       // The timer has started, so stop showing the diagnostic time at once.
       clearTimeout(this.hideDiagnosticTime);
       this.hideDiagnosticTime = undefined;

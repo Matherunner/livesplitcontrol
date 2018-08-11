@@ -123,12 +123,23 @@ export default class App extends React.Component<{}, IState> {
 
   private setupWebSockets(url: string, password: string) {
     this.setState({ socketStatus: Constants.Connection.CONNECTING });
-    this.webSocket = new WebSocket(url, 'rust-websocket');
+    try {
+      this.webSocket = new WebSocket(url, 'rust-websocket');
+    } catch (e) {
+      this.setState({ socketStatus: Constants.Connection.CANNOT_CONNECT });
+      return;
+    }
+
     this.webSocket.onopen = () => {
       this.setState({ socketStatus: Constants.Connection.AUTHENTICATING });
       this.webSocket!.send(password);
     };
     this.webSocket.onmessage = this.handleSocketMessage;
+    this.webSocket.onerror = () => {
+      if (this.state.socketStatus === Constants.Connection.CONNECTING) {
+        this.setState({ socketStatus: Constants.Connection.CANNOT_CONNECT });
+      }
+    };
     this.webSocket.onclose = () => {
       if (this.state.socketStatus === Constants.Connection.AUTHENTICATING) {
         // The server has forcibly closed on us while authenticating,
@@ -136,6 +147,8 @@ export default class App extends React.Component<{}, IState> {
         this.setState({
           socketStatus: Constants.Connection.WRONG_PASSWORD,
         });
+        return;
+      } else if (this.state.socketStatus === Constants.Connection.CANNOT_CONNECT) {
         return;
       }
 

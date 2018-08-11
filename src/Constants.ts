@@ -65,6 +65,7 @@ export const enum Connection {
   CONNECTING,
   AUTHENTICATING,
   CONNECTED,
+  CANNOT_CONNECT,
 }
 
 export function statusToString(status: Connection) {
@@ -79,6 +80,8 @@ export function statusToString(status: Connection) {
       return 'Connected';
     case Connection.WRONG_PASSWORD:
       return 'Authentication Failed';
+    case Connection.CANNOT_CONNECT:
+      return 'Failed to Connect';
     default:
       return 'Unknown';
   }
