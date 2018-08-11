@@ -2,6 +2,7 @@
   "name": "livesplitcontrol",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://matherunner.github.io/livesplitcontrol",
   "dependencies": {
     "autoprefixer": "7.1.6",
     "babel-jest": "^22.1.0",
@@ -48,12 +49,14 @@
     "@types/node": "^10.5.8",
     "@types/react": "^16.4.9",
     "@types/react-dom": "^16.0.7",
+    "gh-pages": "^1.2.0",
     "typescript": "^3.0.1"
   },
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
-    "test": "node scripts/test.js --env=jsdom"
+    "test": "node scripts/test.js --env=jsdom",
+    "deploy": "gh-pages -d build"
   },
   "jest": {
     "collectCoverageFrom": [
